@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  userName    String?   @unique
+  fullName    String?
+  password    String
+  isAdmin     Boolean   @default(false)
+  uploadLimit Int       @default(52428800) // 50MB in bytes (guest default)
+  poolDays    Int       @default(7) // 7 days default for guests
+  storageUsed Int       @default(0) // Storage used in MB
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Content {
+  id             String   @id @default(cuid())
+  filename       String
+  fileType       String
+  fileSize       Int
+  filePath       String
+  isNSFW         Boolean  @default(false)
+  nsfwProbability Int       @default(0)
+  isPrivate      Boolean  @default(false)
+  views          Int       @default(0)
+  likes          Int       @default(0)
+  userId         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ShareLink {
+  id           String   @id @default(cuid())
+  shortCode     String   @unique
+  contentId    String
+  userId       String?
+  views        Int       @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  action      String
+  details     String?
+  ipAddress   String?
+  userAgent   String?
+  userId      String?
+  contentId   String?
+  createdAt   DateTime @default(now())
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
